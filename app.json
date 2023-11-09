@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "iAC Chat",
+    "slug": "iacchat",
+    "version": "1.0.0",
+    "scheme": "iacchat",
+    "orientation": "portrait",
+    "icon": "./src/assets/images/icon.png",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "splash": {
+      "image": "./src/assets/images/splash.png"
+    },
+    "android": {
+      "package": "io.github.sitiom.iacchat",
+      "googleServicesFile": "./google-services.json"
+    },
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "plugins": ["expo-router", "@react-native-google-signin/google-signin"]
+  }
+}

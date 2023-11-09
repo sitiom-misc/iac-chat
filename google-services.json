@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "465591214869",
+    "project_id": "iac-chat",
+    "storage_bucket": "iac-chat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465591214869:android:82d133708d7e948bd7bf1c",
+        "android_client_info": {
+          "package_name": "io.github.sitiom.iacchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "465591214869-hvrt63psbg96bdjqgnuemp99n9b43fb6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.github.sitiom.iacchat",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "465591214869-o74r5cpetehg66fnfd570qd34kvj2m6s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB81zOpG6n5q0xuk0bhTsIT0zlTUKZaCmQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "465591214869-o74r5cpetehg66fnfd570qd34kvj2m6s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
