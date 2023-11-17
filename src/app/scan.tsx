@@ -59,15 +59,15 @@ function Screen({ currentUser }: { currentUser: User }) {
     amount: z.coerce
       .number({ invalid_type_error: "Must be a valid number." })
       .positive()
-      .max(currentUser.balance, {
-        message: `Amount must not exceed your current balance (${currentUser.balance.toLocaleString(
-          "en-PH",
-          {
-            style: "currency",
-            currency: "PHP",
-          }
-        )}).`,
-      })
+      // .max(currentUser.balance, {
+      //   message: `Amount must not exceed your current balance (${currentUser.balance.toLocaleString(
+      //     "en-PH",
+      //     {
+      //       style: "currency",
+      //       currency: "PHP",
+      //     }
+      //   )}).`,
+      // })
       .multipleOf(0.01, {
         message: "Number must only have a maximum of 2 decimal places.",
       }),
@@ -179,12 +179,12 @@ function Screen({ currentUser }: { currentUser: User }) {
                     if (!senderDoc.exists() || !receiverDoc.exists()) {
                       throw "Document does not exist!";
                     }
-                    transaction.update(senderDocRef, {
-                      balance: senderDoc.data()?.balance - amount,
-                    });
-                    transaction.update(receiverDocRef, {
-                      balance: receiverDoc.data()?.balance + amount,
-                    });
+                    // transaction.update(senderDocRef, {
+                    //   balance: senderDoc.data()?.balance - amount,
+                    // });
+                    // transaction.update(receiverDocRef, {
+                    //   balance: receiverDoc.data()?.balance + amount,
+                    // });
                     transaction.set(transactionRef, {
                       amount,
                       date: serverTimestamp(),

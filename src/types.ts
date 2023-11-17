@@ -4,7 +4,8 @@ export type User = {
   id?: string;
   name: string;
   avatarUrl: string;
-  balance: number;
+  createdAt: Timestamp;
+  email: string;
 };
 
 export type Transaction = {

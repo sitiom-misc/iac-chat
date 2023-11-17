@@ -10,7 +10,13 @@ import {
 } from "reactfire";
 import { getHeaderTitle } from "@react-navigation/elements";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import { DocumentReference, doc, setDoc } from "firebase/firestore";
+import {
+  DocumentReference,
+  WithFieldValue,
+  doc,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 import { User } from "@/types";
 
 export default function HomeLayout() {
@@ -48,10 +54,11 @@ function TabsLayout({
   }
 
   if (!userSnap.exists()) {
-    const user: User = {
+    const user: WithFieldValue<User> = {
       name: signInCheckResult.user.displayName ?? "",
+      email: signInCheckResult.user.email ?? "",
       avatarUrl: signInCheckResult.user.photoURL ?? "",
-      balance: 5000, // Give a starting balance of 5000 for testing
+      createdAt: serverTimestamp(),
     };
     setDoc(userDoc, user);
   }
@@ -66,8 +73,8 @@ function TabsLayout({
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: "Home",
-          tabBarLabel: "Home",
+          headerTitle: "Chats",
+          tabBarLabel: "Chats",
           header: (props) => (
             <Navbar {...props}>
               <Link href="/settings">
@@ -78,7 +85,7 @@ function TabsLayout({
           tabBarIcon: ({ color, size, focused }) => {
             return (
               <Icon
-                name={focused ? "home" : "home-outline"}
+                name={focused ? "chat" : "chat-outline"}
                 size={size}
                 color={color}
               />
@@ -87,14 +94,14 @@ function TabsLayout({
         }}
       />
       <Tabs.Screen
-        name="history"
+        name="contacts"
         options={{
-          headerTitle: "Transaction History",
-          tabBarLabel: "Transactions",
+          headerTitle: "People",
+          tabBarLabel: "People",
           tabBarIcon: ({ color, size, focused }) => {
             return (
               <Icon
-                name={focused ? "book" : "book-outline"}
+                name={focused ? "account-multiple" : "account-multiple-outline"}
                 size={size}
                 color={color}
               />
