@@ -12,7 +12,8 @@
       "supportsTablet": true
     },
     "splash": {
-      "image": "./src/assets/images/splash.png"
+      "image": "./src/assets/images/splash.png",
+      "backgroundColor": "#f4fdfc"
     },
     "android": {
       "package": "io.github.sitiom.iacchat",
