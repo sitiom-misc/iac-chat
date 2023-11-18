@@ -20,11 +20,11 @@ import {
 
 function formatTime(date: DateTime) {
   const now = DateTime.now();
-  if (date.hasSame(now, "day")) {
+  if (now.diff(date, "hours").hours < 24) {
     return date.toLocaleString(DateTime.TIME_SIMPLE);
-  } else if (date.diff(now, "days").days <= 7) {
+  } else if (now.diff(date, "days").days < 7) {
     return date.toLocaleString({ weekday: "short" });
-  } else if (date.hasSame(now, "year")) {
+  } else if (now.diff(date, "months").months < 6) {
     return date.toLocaleString({ month: "short", day: "numeric" });
   } else {
     return date.toLocaleString({
