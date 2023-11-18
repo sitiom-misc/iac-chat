@@ -2,19 +2,14 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Redirect, router } from "expo-router";
 import { signOut } from "firebase/auth";
 import { View, StyleSheet, Image } from "react-native";
-import { ActivityIndicator, Text, Divider, Drawer } from "react-native-paper";
-import { useAuth, useSigninCheck } from "reactfire";
+import { Text, Divider, Drawer } from "react-native-paper";
+import { useAuth } from "reactfire";
 
 export default function HistoryScreen() {
-  const { status: signInStatus, data: signInCheckResult } = useSigninCheck();
   const auth = useAuth();
 
-  if (signInStatus === "loading") {
-    return <ActivityIndicator />;
-  }
-
-  if (!signInCheckResult.signedIn || !auth.currentUser) {
-    return <Redirect href="/login" />;
+  if (!auth.currentUser) {
+    return null;
   }
 
   return (

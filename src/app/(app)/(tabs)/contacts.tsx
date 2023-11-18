@@ -1,26 +1,21 @@
 import { User } from "@/types";
 import { DocumentReference, doc } from "firebase/firestore";
-import { User as FirebaseUser } from "firebase/auth";
 import { View, StyleSheet, FlatList } from "react-native";
 import { ActivityIndicator, Avatar, FAB, Text } from "react-native-paper";
-import { useFirestore, useFirestoreDocData, useUser } from "reactfire";
+import { useAuth, useFirestore, useFirestoreDocData, useUser } from "reactfire";
 
 export default function ContactScreen() {
-  const { status, data: currentUser } = useUser();
-
-  if (status === "loading") {
-    return <ActivityIndicator />;
-  }
+  const { currentUser } = useAuth();
   if (!currentUser) {
     return null;
   }
 
-  return <ScreenWithUser user={currentUser} />;
-}
-
-function ScreenWithUser({ user }: { user: FirebaseUser }) {
   const firestore = useFirestore();
-  const userDoc = doc(firestore, "users", user.uid) as DocumentReference<User>;
+  const userDoc = doc(
+    firestore,
+    "users",
+    currentUser.uid
+  ) as DocumentReference<User>;
   const { status: userDataStatus, data: userData } = useFirestoreDocData(
     userDoc,
     {
@@ -39,6 +34,7 @@ function ScreenWithUser({ user }: { user: FirebaseUser }) {
       <FlatList
         style={styles.container}
         data={userData.contacts}
+        contentContainerStyle={{ gap: 20 }}
         renderItem={({ item }) => <ContactItem userId={item} />}
         keyExtractor={(item) => item}
       />
@@ -76,8 +72,10 @@ function ContactItem({ userId }: { userId: string }) {
       />
       <View style={{ flex: 1 }}>
         <View>
-          <Text variant="titleMedium">{user.name}</Text>
-          <Text numberOfLines={1}>{user.email}</Text>
+          <Text variant="titleSmall">{user.name}</Text>
+          <Text numberOfLines={1} variant="bodySmall">
+            {user.email}
+          </Text>
         </View>
       </View>
     </View>
@@ -91,7 +89,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingBottom: 28,
     gap: 15,
   },
   fab: {

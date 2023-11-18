@@ -8,3 +8,18 @@ export type User = {
   email: string;
   contacts: string[];
 };
+
+export type Room = {
+  id?: string;
+  name: string;
+  lastUpdated: Timestamp;
+  members: string[];
+  iconUrl?: string;
+};
+
+export type Message = {
+  id?: string;
+  createdAt: Timestamp;
+  content: string;
+  from: string;
+};

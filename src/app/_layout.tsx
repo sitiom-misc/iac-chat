@@ -11,7 +11,7 @@ import { getReactNativePersistence } from "firebase/auth/react-native";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getStorage, connectStorageEmulator } from "firebase/storage";
 import { Material3ThemeProvider } from "@/lib/Material3ThemeProvider";
-import { Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialNavBar from "@/components/material-nav-bar";
