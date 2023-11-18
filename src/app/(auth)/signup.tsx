@@ -91,7 +91,7 @@ export default function SignupScreen() {
   return (
     <View style={styles.container}>
       <Pressable
-        android_ripple={{ color: "orange" }}
+        android_ripple={{ color: "cyan" }}
         onPress={pickImage}
         onLongPress={() => {
           setImageUri(null);

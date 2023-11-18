@@ -11,7 +11,7 @@ import { getReactNativePersistence } from "firebase/auth/react-native";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getStorage, connectStorageEmulator } from "firebase/storage";
 import { Material3ThemeProvider } from "@/lib/Material3ThemeProvider";
-import { Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialNavBar from "@/components/material-nav-bar";
@@ -88,15 +88,7 @@ export default function RootLayout() {
               headerShown: false,
               animation: "fade_from_bottom",
             }}
-          >
-            <Stack.Screen
-              name="settings"
-              options={{
-                headerTitle: "Settings",
-                headerShown: true,
-              }}
-            />
-          </Stack>
+          />
         </Material3ThemeProvider>
       </FirebaseProviders>
     </FirebaseAppProvider>
