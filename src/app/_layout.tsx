@@ -96,16 +96,6 @@ export default function RootLayout() {
                 headerShown: true,
               }}
             />
-            <Stack.Screen
-              name="scan"
-              options={{
-                headerTitle: "Scan QR",
-                headerShown: true,
-                header: (props) => (
-                  <MaterialNavBar {...props} elevated={true} />
-                ),
-              }}
-            />
           </Stack>
         </Material3ThemeProvider>
       </FirebaseProviders>

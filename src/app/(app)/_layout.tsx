@@ -59,6 +59,7 @@ function TabsLayout({
       email: signInCheckResult.user.email ?? "",
       avatarUrl: signInCheckResult.user.photoURL ?? "",
       createdAt: serverTimestamp(),
+      contacts: [],
     };
     setDoc(userDoc, user);
   }

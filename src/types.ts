@@ -6,12 +6,5 @@ export type User = {
   avatarUrl: string;
   createdAt: Timestamp;
   email: string;
-};
-
-export type Transaction = {
-  id?: string;
-  senderId: string;
-  receiverId: string;
-  amount: number;
-  date: Timestamp;
+  contacts: string[];
 };
