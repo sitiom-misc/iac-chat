@@ -102,7 +102,7 @@ export default function SignupScreen() {
           source={
             imageUri
               ? { uri: imageUri }
-              : require("@/assets/images/avatar-3.png")
+              : require("@/assets/images/avatar-2.png")
           }
           style={styles.logo}
         />

@@ -117,7 +117,7 @@ function Screen({ currentUser }: { currentUser: User }) {
               source={
                 receiver?.data()?.avatarUrl
                   ? { uri: receiver?.data()?.avatarUrl }
-                  : require("@/assets/images/avatar-3.png")
+                  : require("@/assets/images/avatar-2.png")
               }
             />
             <Text>Sending to {receiver?.data()?.name}</Text>

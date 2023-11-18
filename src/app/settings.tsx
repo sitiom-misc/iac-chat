@@ -24,7 +24,7 @@ export default function HistoryScreen() {
           source={
             auth.currentUser.photoURL
               ? { uri: auth.currentUser.photoURL }
-              : require("@/assets/images/avatar-3.png")
+              : require("@/assets/images/avatar-2.png")
           }
           style={styles.avatarImage}
         />
