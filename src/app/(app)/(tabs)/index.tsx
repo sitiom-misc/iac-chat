@@ -1,4 +1,6 @@
+import useChatDetails from "@/hooks/useChatDetails";
 import { Message, Room } from "@/types";
+import { router } from "expo-router";
 import {
   CollectionReference,
   collection,
@@ -10,7 +12,12 @@ import {
 } from "firebase/firestore";
 import { DateTime } from "luxon";
 import { View, StyleSheet, ImageSourcePropType, FlatList } from "react-native";
-import { ActivityIndicator, Avatar, Text } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Avatar,
+  Text,
+  TouchableRipple,
+} from "react-native-paper";
 import {
   useAuth,
   useFirestore,
@@ -66,33 +73,16 @@ function ChatItem({ room }: { room: Room }) {
     lastMessage: Message;
   }) => {
     const { currentUser } = useAuth();
-    if (!currentUser) return null;
-    const firestore = useFirestore();
+    if (!currentUser || !lastMessage) return null;
 
-    let roomName: string;
-    let icon: ImageSourcePropType;
+    const { status: detailsStatus, roomName, iconUrl } = useChatDetails(room);
+
     let message: string;
     if (room.members.length === 2) {
-      const otherUserId = room.members.find((id) => id !== currentUser.uid);
-      if (!otherUserId) return null;
-      const userDoc = doc(firestore, `users/${otherUserId}`);
-      const { status, data: user } = useFirestoreDocData(userDoc, {
-        idField: "id",
-      });
-      if (status === "loading") {
-        return <ActivityIndicator />;
-      }
-      if (!user) {
-        return null;
-      }
       message =
         lastMessage.from === currentUser.uid
           ? `You: ${lastMessage.content}`
           : lastMessage.content;
-      roomName = user.name;
-      icon = user.avatarUrl
-        ? { uri: user.avatarUrl }
-        : require("@/assets/images/avatar-2.png");
     } else {
       const userDoc = doc(firestore, `users/${lastMessage.from}`);
       const { status, data: user } = useFirestoreDocData(userDoc, {
@@ -105,29 +95,42 @@ function ChatItem({ room }: { room: Room }) {
         return null;
       }
       message = `${
-        lastMessage.from !== currentUser.uid ? user.name.split(" ")[0] : "You"
+        lastMessage.from === currentUser.uid ? "You" : user.name.split(" ")[0]
       }: ${lastMessage.content}`;
-      roomName = room.name ?? room.members.join(", "); // TODO: Join actual names
-      icon = room.iconUrl
-        ? { uri: room.iconUrl }
-        : require("@/assets/images/group_chat.png");
     }
+
+    switch (detailsStatus) {
+      case "loading":
+        return <ActivityIndicator />;
+      case "error":
+        return null;
+    }
+
     return (
-      <View style={styles.itemContainer}>
-        <Avatar.Image size={53} source={icon} />
-        <View style={{ flex: 1 }}>
-          <Text variant="bodyLarge">{roomName}</Text>
-          <View style={styles.messageContainer}>
-            <Text style={{ flexShrink: 1 }} numberOfLines={1}>
-              {message}
-            </Text>
-            <Text>
-              {" "}
-              •{" "}
-              {formatTime(DateTime.fromJSDate(lastMessage.createdAt.toDate()))}
-            </Text>
-          </View>
-        </View>
+      <View style={{ borderRadius: 20, overflow: "hidden" }}>
+        <TouchableRipple
+          onPress={() => router.push(`/room/${room.id}`)}
+          style={styles.itemContainer}
+        >
+          <>
+            <Avatar.Image size={53} source={iconUrl} />
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge">{roomName}</Text>
+              <View style={styles.messageContainer}>
+                <Text style={{ flexShrink: 1 }} numberOfLines={1}>
+                  {message}
+                </Text>
+                <Text>
+                  {" "}
+                  •{" "}
+                  {formatTime(
+                    DateTime.fromJSDate(lastMessage.createdAt.toDate())
+                  )}
+                </Text>
+              </View>
+            </View>
+          </>
+        </TouchableRipple>
       </View>
     );
   };
@@ -162,19 +165,20 @@ export default function IndexScreen() {
       renderItem={({ item }) => <ChatItem room={item} />}
       keyExtractor={(item) => item.id!}
       style={styles.container}
-      contentContainerStyle={{ gap: 20 }}
     />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: "5%",
+    padding: "3%",
   },
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 15,
+    paddingVertical: 10,
+    paddingHorizontal: "3%",
   },
   messageContainer: {
     flexDirection: "row",

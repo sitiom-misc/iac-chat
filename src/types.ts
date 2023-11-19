@@ -11,7 +11,7 @@ export type User = {
 
 export type Room = {
   id?: string;
-  name: string;
+  name?: string;
   lastUpdated: Timestamp;
   members: string[];
   iconUrl?: string;
