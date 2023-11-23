@@ -1,6 +1,6 @@
 import useChatDetails from "@/hooks/useChatDetails";
 import { Message, Room } from "@/types";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import {
   CollectionReference,
   collection,
@@ -108,29 +108,28 @@ function ChatItem({ room }: { room: Room }) {
 
     return (
       <View style={{ borderRadius: 20, overflow: "hidden" }}>
-        <TouchableRipple
-          onPress={() => router.push(`/room/${room.id}`)}
-          style={styles.itemContainer}
-        >
-          <>
-            <Avatar.Image size={53} source={iconUrl} />
-            <View style={{ flex: 1 }}>
-              <Text variant="bodyLarge">{roomName}</Text>
-              <View style={styles.messageContainer}>
-                <Text style={{ flexShrink: 1 }} numberOfLines={1}>
-                  {message}
-                </Text>
-                <Text>
-                  {" "}
-                  •{" "}
-                  {formatTime(
-                    DateTime.fromJSDate(lastMessage.createdAt.toDate())
-                  )}
-                </Text>
+        <Link href={`/room/${room.id}`}>
+          <TouchableRipple style={styles.itemContainer}>
+            <>
+              <Avatar.Image size={53} source={iconUrl} />
+              <View style={{ flex: 1 }}>
+                <Text variant="bodyLarge">{roomName}</Text>
+                <View style={styles.messageContainer}>
+                  <Text style={{ flexShrink: 1 }} numberOfLines={1}>
+                    {message}
+                  </Text>
+                  <Text>
+                    {" "}
+                    •{" "}
+                    {formatTime(
+                      DateTime.fromJSDate(lastMessage.createdAt.toDate())
+                    )}
+                  </Text>
+                </View>
               </View>
-            </View>
-          </>
-        </TouchableRipple>
+            </>
+          </TouchableRipple>
+        </Link>
       </View>
     );
   };
