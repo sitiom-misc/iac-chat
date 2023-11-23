@@ -1,12 +1,20 @@
 import useChatDetails from "@/hooks/useChatDetails";
-import { Room } from "@/types";
+import { Message, Room } from "@/types";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { DocumentReference, collection, doc } from "firebase/firestore";
+import {
+  CollectionReference,
+  DocumentReference,
+  collection,
+  doc,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import {
   View,
   StyleSheet,
   ImageRequireSource,
   ImageURISource,
+  ImageSourcePropType,
 } from "react-native";
 import {
   ActivityIndicator,
@@ -16,8 +24,19 @@ import {
   Text,
   TextInput,
 } from "react-native-paper";
-import { useFirestore, useFirestoreDocData } from "reactfire";
-import { GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import {
+  useAuth,
+  useFirestore,
+  useFirestoreCollection,
+  useFirestoreCollectionData,
+  useFirestoreDocData,
+} from "reactfire";
+import {
+  GiftedChat,
+  InputToolbar,
+  Message as GiftedMessage,
+  IMessage,
+} from "react-native-gifted-chat";
 import MaterialNavBar from "@/components/material-nav-bar";
 
 export default function RoomScreen() {
@@ -28,6 +47,7 @@ export default function RoomScreen() {
   const { status: roomStatus, data: room } = useFirestoreDocData(roomRef, {
     idField: "id",
   });
+
   if (roomStatus === "loading") {
     return (
       <>
@@ -41,126 +61,137 @@ export default function RoomScreen() {
     );
   }
 
-  const ScreenWithRoom = ({ room }: { room: Room }) => {
-    const {
-      status: chatDetailsStatus,
-      iconUrl,
-      roomName,
-    } = useChatDetails(room);
-    if (chatDetailsStatus === "loading") {
-      return (
-        <>
-          <Stack.Screen
-            options={{
-              title: "",
-            }}
-          />
-          <ActivityIndicator />
-        </>
-      );
-    }
-    if (chatDetailsStatus === "error") {
-      return <Text>Error loading chat details</Text>;
-    }
+  return <ChatRoom room={room} />;
+}
 
-    let avatar: string | ImageRequireSource | undefined;
-
-    if ((iconUrl as ImageURISource).uri) {
-      avatar = (iconUrl as ImageURISource).uri;
-    }
-
+function ChatRoom({ room }: { room: Room }) {
+  const { status: chatDetailsStatus, iconUrl, roomName } = useChatDetails(room);
+  if (chatDetailsStatus === "loading") {
     return (
-      <View style={styles.container}>
+      <>
         <Stack.Screen
           options={{
-            title: roomName,
-            header: (props) => (
-              <MaterialNavBar {...props}>
-                <Avatar.Image
-                  source={iconUrl}
-                  size={40}
-                  style={{ marginRight: 10 }}
-                />
-              </MaterialNavBar>
-            ),
+            title: "",
           }}
         />
-        <GiftedChat
-          messages={[
-            {
-              _id: 1,
-              text: "And my message",
-              createdAt: new Date(Date.UTC(2016, 5, 11, 17, 20, 0)),
-              user: {
-                _id: 2,
-                name: "React Native",
-                avatar,
-              },
-              sent: true,
-              received: true,
-              pending: true,
-            },
-            {
-              _id: 2,
-              text: "My message",
-              createdAt: new Date(Date.UTC(2016, 5, 11, 17, 20, 0)),
-              user: {
-                _id: 1,
-                name: "React Native",
-                avatar: "https://facebook.github.io/react/img/logo_og.png",
-              },
-              sent: true,
-              received: true,
-              pending: true,
-            },
-          ]}
-          user={{
-            _id: 1,
-          }}
-          // alwaysShowSend={true}
-          // Render custom UI using react-native-paper
-          renderSend={({ disabled }) => (
-            <IconButton
-              icon="send"
-              size={25}
-              onPress={() => console.log("Pressed send button")}
-              disabled={disabled}
-            />
-          )}
-          renderInputToolbar={(props) => {
-            const { containerStyle, ...rest } = props;
-            const {
-              renderActions,
-              onPressActionButton,
-              renderComposer,
-              renderSend,
-              renderAccessory,
-            } = rest;
-            return (
-              <View
-                style={{
-                  flexDirection: "row",
-                  width: "100%",
-                  alignItems: "center",
-                  paddingLeft: 10,
-                }}
-              >
-                <TextInput
-                  mode="outlined"
-                  placeholder="Message"
-                  outlineStyle={{ borderRadius: 100 }}
-                  style={{ flex: 1, height: 50 }}
-                />
-                {renderSend?.(props)}
-              </View>
-            );
-          }}
-        />
-      </View>
+        <ActivityIndicator />
+      </>
     );
-  };
+  }
+  if (chatDetailsStatus === "error") {
+    return <Text>Error loading chat details</Text>;
+  }
 
-  return <ScreenWithRoom room={room} />;
+  return <Chat roomName={roomName} iconUrl={iconUrl} />;
+}
+
+function Chat({
+  roomName,
+  iconUrl,
+}: {
+  roomName: string;
+  iconUrl: ImageSourcePropType;
+}) {
+  const { id: roomId } = useLocalSearchParams<{ id: string }>();
+  const { currentUser } = useAuth();
+  if (!roomId || !currentUser) return null;
+  const firestore = useFirestore();
+  const messagesQuery = query(
+    collection(
+      firestore,
+      `rooms/${roomId}/messages`
+    ) as CollectionReference<Message>,
+    orderBy("createdAt", "desc")
+  );
+  const { status: messagesStatus, data: messages } = useFirestoreCollectionData(
+    messagesQuery,
+    {
+      idField: "id",
+    }
+  );
+  if (messagesStatus === "loading") {
+    return <ActivityIndicator />;
+  }
+
+  let avatar: string | ImageRequireSource | undefined;
+
+  if ((iconUrl as ImageURISource).uri) {
+    avatar = (iconUrl as ImageURISource).uri;
+  }
+
+  const giftedMessages: IMessage[] = messages.map((message) => ({
+    _id: message.id!,
+    text: message.content,
+    createdAt: message.createdAt.toDate(),
+    user: {
+      _id: message.from,
+      name: roomName,
+      avatar,
+    },
+    sent: true,
+    received: true,
+  }));
+
+  return (
+    <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          title: roomName,
+          header: (props) => (
+            <MaterialNavBar {...props}>
+              <Avatar.Image
+                source={iconUrl}
+                size={40}
+                style={{ marginRight: 10 }}
+              />
+            </MaterialNavBar>
+          ),
+        }}
+      />
+      <GiftedChat
+        messages={giftedMessages}
+        user={{
+          _id: currentUser.uid,
+        }}
+        renderSend={({ disabled }) => (
+          <IconButton
+            icon="send"
+            size={25}
+            onPress={() => console.log("Pressed send button")}
+            disabled={disabled}
+          />
+        )}
+        renderInputToolbar={(props) => {
+          const { containerStyle, ...rest } = props;
+          const {
+            renderActions,
+            onPressActionButton,
+            renderComposer,
+            renderSend,
+            renderAccessory,
+          } = rest;
+          return (
+            <View
+              style={{
+                flexDirection: "row",
+                width: "100%",
+                alignItems: "center",
+                paddingLeft: 10,
+              }}
+            >
+              <TextInput
+                mode="outlined"
+                placeholder="Message"
+                outlineStyle={{ borderRadius: 100 }}
+                style={{ flex: 1, height: 50 }}
+              />
+              {renderSend?.(props)}
+            </View>
+          );
+        }}
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
