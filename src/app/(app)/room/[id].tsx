@@ -157,21 +157,6 @@ function Chat({
         user={{
           _id: currentUser.uid,
         }}
-        renderSend={({ disabled, onSend, text, sendButtonProps }) => {
-          return (
-            <IconButton
-              icon="send"
-              size={25}
-              onPress={() => {
-                if (text && onSend) {
-                  onSend({ text: text.trim() }, true);
-                }
-              }}
-              disabled={disabled || !text}
-              {...sendButtonProps}
-            />
-          );
-        }}
         onSend={async (messages) => {
           const batch = writeBatch(firestore);
           messages.forEach((message) => {
@@ -191,6 +176,21 @@ function Chat({
             lastUpdated: new Date(),
           });
           batch.commit();
+        }}
+        renderSend={({ disabled, onSend, text, sendButtonProps }) => {
+          return (
+            <IconButton
+              icon="send"
+              size={25}
+              onPress={() => {
+                if (text && onSend) {
+                  onSend({ text: text.trim() }, true);
+                }
+              }}
+              disabled={disabled || !text}
+              {...sendButtonProps}
+            />
+          );
         }}
         renderComposer={({
           composerHeight,
