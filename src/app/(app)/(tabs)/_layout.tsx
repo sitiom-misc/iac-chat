@@ -20,7 +20,7 @@ export default function HomeLayout() {
           tabBarLabel: "Chats",
           header: (props) => (
             <Navbar {...props}>
-              <Link href="/settings">
+              <Link href="/settings" asChild>
                 <Appbar.Action icon="account-circle-outline" />
               </Link>
             </Navbar>
@@ -50,6 +50,16 @@ export default function HomeLayout() {
               />
             );
           },
+          header: (props) => (
+            <Navbar {...props} elevated={true}>
+              <Appbar.Action
+                icon="qrcode"
+                onPress={() => {
+                  console.log("Show QR Code pressed");
+                }}
+              />
+            </Navbar>
+          ),
         }}
       />
     </Tabs>

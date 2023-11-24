@@ -15,7 +15,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { View, StyleSheet, FlatList } from "react-native";
 import {
@@ -38,7 +38,6 @@ import {
 } from "reactfire";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { z } from "zod";
-import Explosion from "react-native-confetti-cannon";
 
 export default function ContactScreen() {
   const { currentUser } = useAuth();
@@ -60,6 +59,8 @@ export default function ContactScreen() {
   );
   const [isDialogvisible, setDialogVisible] = useState(false);
   const [isConfettiVisible, setConfettiVisible] = useState(false);
+  const [fabState, setFabState] = useState({ open: false });
+  const { open } = fabState;
 
   const validUserSchema = z.object({
     email: z
@@ -239,10 +240,23 @@ export default function ContactScreen() {
         renderItem={({ item }) => <ContactItem userId={item} />}
         keyExtractor={(item) => item}
       />
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => setDialogVisible(true)}
+      <FAB.Group
+        open={open}
+        visible
+        icon={open ? "close" : "plus"}
+        actions={[
+          {
+            icon: "email",
+            label: "Email",
+            onPress: () => setDialogVisible(true),
+          },
+          {
+            icon: "qrcode-scan",
+            label: "Scan QR",
+            onPress: () => console.log("Pressed QR Code scan"),
+          },
+        ]}
+        onStateChange={({ open }) => setFabState({ open })}
       />
     </>
   );
@@ -333,11 +347,5 @@ const styles = StyleSheet.create({
     gap: 15,
     paddingVertical: 10,
     paddingHorizontal: "2%",
-  },
-  fab: {
-    position: "absolute",
-    margin: 16,
-    right: 0,
-    bottom: 0,
   },
 });

@@ -6,6 +6,7 @@ import { getHeaderTitle } from "@react-navigation/elements";
 type Props = {
   elevated?: boolean;
   style?: ViewStyle;
+  children?: React.ReactNode;
 };
 
 function MaterialNavBar({
@@ -15,12 +16,14 @@ function MaterialNavBar({
   route,
   style,
   options,
+  children,
 }: NativeStackHeaderProps & Props) {
   const title = getHeaderTitle(options, route.name);
 
   return (
     <Appbar.Header elevated={elevated} style={style}>
       {back ? <Appbar.BackAction onPress={navigation.goBack} /> : null}
+      {children}
       <Appbar.Content title={title ?? route.name} />
     </Appbar.Header>
   );

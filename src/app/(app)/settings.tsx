@@ -1,5 +1,4 @@
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { Redirect, router } from "expo-router";
 import { signOut } from "firebase/auth";
 import { View, StyleSheet, Image } from "react-native";
 import { Text, Divider, Drawer } from "react-native-paper";
@@ -39,7 +38,6 @@ export default function HistoryScreen() {
             await GoogleSignin.signOut();
           }
           await signOut(auth);
-          router.back(); // To clear the stack history
         }}
         label="Sign out"
       />
