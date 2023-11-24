@@ -81,6 +81,12 @@ function LayoutWithAuth({
           headerTitle: "Settings",
         }}
       />
+      <Stack.Screen
+        name="scan"
+        options={{
+          headerTitle: "Scan QR",
+        }}
+      />
     </Stack>
   );
 }

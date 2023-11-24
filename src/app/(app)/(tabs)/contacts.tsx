@@ -1,6 +1,6 @@
 import { Room, User } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   CollectionReference,
   DocumentReference,
@@ -45,6 +45,8 @@ export default function ContactScreen() {
     return null;
   }
 
+  const { email: emailParam } = useLocalSearchParams<{ email?: string }>();
+
   const firestore = useFirestore();
   const userDoc = doc(
     firestore,
@@ -57,7 +59,7 @@ export default function ContactScreen() {
       idField: "id",
     }
   );
-  const [isDialogvisible, setDialogVisible] = useState(false);
+  const [isdialogOpened, setDialogOpened] = useState<boolean>(!!emailParam);
   const [isConfettiVisible, setConfettiVisible] = useState(false);
   const [fabState, setFabState] = useState({ open: false });
   const { open } = fabState;
@@ -100,9 +102,13 @@ export default function ContactScreen() {
     watch,
     formState: { errors, isSubmitting, isValid, isSubmitSuccessful },
     reset,
+    setValue,
   } = useForm<z.infer<typeof validUserSchema>>({
     resolver: zodResolver(validUserSchema),
     mode: "onChange",
+    defaultValues: {
+      email: emailParam,
+    },
   });
   const email = watch("email");
 
@@ -111,6 +117,14 @@ export default function ContactScreen() {
       reset();
     }
   }, [isSubmitSuccessful]);
+
+  if (emailParam !== undefined && emailParam !== email) {
+    setValue("email", emailParam, {
+      shouldTouch: true,
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }
 
   if (userDataStatus === "loading") {
     return <ActivityIndicator />;
@@ -166,9 +180,11 @@ export default function ContactScreen() {
       )}
       <Portal>
         <Dialog
-          visible={isDialogvisible}
+          visible={isdialogOpened || !!emailParam}
           onDismiss={() => {
-            setDialogVisible(false);
+            setDialogOpened(false);
+            // @ts-ignore
+            router.setParams({ email: undefined });
             reset();
           }}
         >
@@ -196,7 +212,10 @@ export default function ContactScreen() {
                   label="Email"
                   onBlur={onBlur}
                   keyboardType="email-address"
-                  onChangeText={onChange}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    router.setParams({ email: text });
+                  }}
                   value={value}
                   error={!!errors.email}
                 />
@@ -224,7 +243,9 @@ export default function ContactScreen() {
                 await updateDoc(userDoc, {
                   contacts: [...userData.contacts, userId],
                 });
-                setDialogVisible(false);
+                setDialogOpened(false);
+                // @ts-ignore
+                router.setParams({ email: undefined });
                 setConfettiVisible(true);
               })}
               disabled={!isValid || isSubmitting}
@@ -248,12 +269,12 @@ export default function ContactScreen() {
           {
             icon: "email",
             label: "Email",
-            onPress: () => setDialogVisible(true),
+            onPress: () => setDialogOpened(true),
           },
           {
             icon: "qrcode-scan",
             label: "Scan QR",
-            onPress: () => console.log("Pressed QR Code scan"),
+            onPress: () => router.push("/scan"),
           },
         ]}
         onStateChange={({ open }) => setFabState({ open })}
