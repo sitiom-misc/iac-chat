@@ -20,7 +20,7 @@ export default function HomeLayout() {
           tabBarLabel: "Chats",
           header: (props) => (
             <Navbar {...props}>
-              <Link href="/settings">
+              <Link href="/settings" asChild>
                 <Appbar.Action icon="account-circle-outline" />
               </Link>
             </Navbar>
