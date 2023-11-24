@@ -38,6 +38,7 @@ import {
 } from "reactfire";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { z } from "zod";
+import { RectButton, Swipeable } from "react-native-gesture-handler";
 
 export default function ContactScreen() {
   const { currentUser } = useAuth();
@@ -48,6 +49,11 @@ export default function ContactScreen() {
   const { email: emailParam } = useLocalSearchParams<{ email?: string }>();
 
   const firestore = useFirestore();
+  const deleteContact = async (contactId: string) => {
+    const updatedContacts = userData.contacts.filter((id) => id !== contactId);
+    await updateDoc(userDoc, { contacts: updatedContacts });
+  };
+
   const userDoc = doc(
     firestore,
     "users",
@@ -258,9 +264,15 @@ export default function ContactScreen() {
       <FlatList
         style={styles.container}
         data={userData.contacts}
-        renderItem={({ item }) => <ContactItem userId={item} />}
+        renderItem={({ item }) => (
+          <SwipeableContactItem
+            userId={item}
+            onDelete={() => deleteContact(item)}
+          />
+        )}
         keyExtractor={(item) => item}
       />
+
       <FAB.Group
         open={open}
         visible
@@ -282,6 +294,31 @@ export default function ContactScreen() {
     </>
   );
 }
+
+const SwipeableContactItem = ({
+  userId,
+  onDelete,
+}: {
+  userId: string;
+  onDelete: () => void;
+}) => {
+  const renderRightActions = () => (
+    <RectButton
+      style={styles.deleteButton}
+      onPress={() => {
+        onDelete();
+      }}
+    >
+      <FAB icon="delete" style={{ backgroundColor: "#6e0000" }} />
+    </RectButton>
+  );
+
+  return (
+    <Swipeable renderRightActions={renderRightActions}>
+      <ContactItem userId={userId} />
+    </Swipeable>
+  );
+};
 
 function ContactItem({ userId }: { userId: string }) {
   const firestore = useFirestore();
@@ -368,5 +405,10 @@ const styles = StyleSheet.create({
     gap: 15,
     paddingVertical: 10,
     paddingHorizontal: "2%",
+  },
+  deleteButton: {
+    width: 80,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

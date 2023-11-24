@@ -3,6 +3,7 @@ import { Message, Room } from "@/types";
 import { Link } from "expo-router";
 import {
   CollectionReference,
+  Timestamp,
   collection,
   doc,
   limit,
@@ -15,6 +16,7 @@ import { View, StyleSheet, FlatList } from "react-native";
 import {
   ActivityIndicator,
   Avatar,
+  FAB,
   Text,
   TouchableRipple,
 } from "react-native-paper";
@@ -24,12 +26,14 @@ import {
   useFirestoreCollectionData,
   useFirestoreDocData,
 } from "reactfire";
+import { RectButton, Swipeable } from "react-native-gesture-handler";
 
 export default function IndexScreen() {
   const { currentUser } = useAuth();
   if (!currentUser) return null;
 
   const firestore = useFirestore();
+  const deleteChat = async (contactId: string) => {};
   const roomsCol = collection(firestore, "rooms") as CollectionReference<Room>;
   const myRoomsQuery = query(
     roomsCol,
@@ -49,12 +53,41 @@ export default function IndexScreen() {
   return (
     <FlatList
       data={myRooms}
-      renderItem={({ item }) => <ChatItem room={item} />}
-      keyExtractor={(item) => item.id!}
+      renderItem={({ item }) => (
+        <>
+          <SwipeableChatItem
+            onDelete={() => deleteChat(item.id || "")}
+            userId={""}
+          />
+          <ChatItem room={item} />
+        </>
+      )}
+      keyExtractor={(item) => item.id || "defaultKey"}
       style={styles.container}
     />
   );
 }
+
+const SwipeableChatItem = ({
+  userId,
+  onDelete,
+}: {
+  userId: string;
+  onDelete: () => void;
+}) => {
+  const renderRightActions = () => (
+    <RectButton
+      style={styles.deleteButton}
+      onPress={() => {
+        onDelete();
+      }}
+    >
+      <FAB icon="delete" style={{ backgroundColor: "#6e0000" }} />
+    </RectButton>
+  );
+
+  return <Swipeable renderRightActions={renderRightActions}></Swipeable>;
+};
 
 function ChatItem({ room }: { room: Room }) {
   if (!room) return null;
@@ -186,5 +219,13 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     flexDirection: "row",
+  },
+  deleteButton: {
+    width: 80,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  swipeableChatItem: {
+    backgroundColor: "white",
   },
 });
