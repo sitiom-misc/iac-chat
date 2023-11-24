@@ -8,6 +8,8 @@ import {
   doc,
   orderBy,
   query,
+  serverTimestamp,
+  writeBatch,
 } from "firebase/firestore";
 import {
   View,
@@ -36,8 +38,10 @@ import {
   InputToolbar,
   Message as GiftedMessage,
   IMessage,
+  ComposerProps,
 } from "react-native-gifted-chat";
 import MaterialNavBar from "@/components/material-nav-bar";
+import { server } from "../../../../metro.config";
 
 export default function RoomScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -122,14 +126,14 @@ function Chat({
   const giftedMessages: IMessage[] = messages.map((message) => ({
     _id: message.id!,
     text: message.content,
-    createdAt: message.createdAt.toDate(),
+    createdAt: message.createdAt?.toDate(),
     user: {
       _id: message.from,
       name: roomName,
       avatar,
     },
     sent: true,
-    received: true,
+    received: !!message.createdAt,
   }));
 
   return (
@@ -153,14 +157,68 @@ function Chat({
         user={{
           _id: currentUser.uid,
         }}
-        renderSend={({ disabled }) => (
-          <IconButton
-            icon="send"
-            size={25}
-            onPress={() => console.log("Pressed send button")}
-            disabled={disabled}
-          />
-        )}
+        renderSend={({ disabled, onSend, text, sendButtonProps }) => {
+          return (
+            <IconButton
+              icon="send"
+              size={25}
+              onPress={() => {
+                if (text && onSend) {
+                  onSend({ text: text.trim() }, true);
+                }
+              }}
+              disabled={disabled || !text}
+              {...sendButtonProps}
+            />
+          );
+        }}
+        onSend={async (messages) => {
+          const batch = writeBatch(firestore);
+          messages.forEach((message) => {
+            const messageRef = doc(
+              collection(
+                firestore,
+                `rooms/${roomId}/messages`
+              ) as CollectionReference<Message>
+            );
+            batch.set(messageRef, {
+              content: message.text,
+              from: currentUser.uid,
+              createdAt: serverTimestamp(),
+            });
+          });
+          batch.update(doc(firestore, `rooms/${roomId}`), {
+            lastUpdated: new Date(),
+          });
+          batch.commit();
+        }}
+        renderComposer={({
+          composerHeight,
+          disableComposer = false,
+          keyboardAppearance = "default",
+          multiline,
+          onTextChanged = () => {},
+          placeholder,
+          text = "",
+          textInputAutoFocus = false,
+        }) => {
+          return (
+            <TextInput
+              mode="outlined"
+              outlineStyle={{ borderRadius: 100 }}
+              style={{ flex: 1, height: composerHeight }}
+              placeholder={placeholder}
+              multiline={multiline}
+              editable={!disableComposer}
+              onChangeText={onTextChanged}
+              autoFocus={textInputAutoFocus}
+              value={text}
+              enablesReturnKeyAutomatically
+              keyboardAppearance={keyboardAppearance}
+            />
+          );
+        }}
+        placeholder="Message"
         renderInputToolbar={(props) => {
           const { containerStyle, ...rest } = props;
           const {
@@ -179,12 +237,7 @@ function Chat({
                 paddingLeft: 10,
               }}
             >
-              <TextInput
-                mode="outlined"
-                placeholder="Message"
-                outlineStyle={{ borderRadius: 100 }}
-                style={{ flex: 1, height: 50 }}
-              />
+              {renderComposer?.(props as ComposerProps)}
               {renderSend?.(props)}
             </View>
           );

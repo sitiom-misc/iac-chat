@@ -50,6 +50,16 @@ export default function HomeLayout() {
               />
             );
           },
+          header: (props) => (
+            <Navbar {...props} elevated={true}>
+              <Appbar.Action
+                icon="qrcode"
+                onPress={() => {
+                  console.log("Show QR Code pressed");
+                }}
+              />
+            </Navbar>
+          ),
         }}
       />
     </Tabs>
