@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "iAC Chat",
+    "name": "MongoChat",
     "slug": "iacchat",
     "version": "1.0.0",
     "scheme": "iacchat",
@@ -13,7 +13,7 @@
     },
     "splash": {
       "image": "./src/assets/images/splash.png",
-      "backgroundColor": "#f4fdfc"
+      "backgroundColor": "#1b1c17"
     },
     "android": {
       "package": "io.github.sitiom.iacchat",

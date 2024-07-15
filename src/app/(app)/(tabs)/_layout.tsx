@@ -96,7 +96,7 @@ export default function HomeLayout() {
                   <Dialog.Content style={{ alignItems: "center" }}>
                     <QRCode
                       value={`iacchat:${currentUser.uid}`}
-                      logo={require("@/assets/images/icon-transparent.png")}
+                      logo={require("@/assets/images/icon.png")}
                       backgroundColor="transparent"
                       color={theme.colors.inverseSurface}
                       size={150}

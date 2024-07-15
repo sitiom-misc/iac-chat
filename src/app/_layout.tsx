@@ -81,7 +81,7 @@ export default function RootLayout() {
   return (
     <FirebaseAppProvider firebaseConfig={firebaseConfig}>
       <FirebaseProviders>
-        <Material3ThemeProvider sourceColor="#00d8f8">
+        <Material3ThemeProvider sourceColor="#74e362">
           <Stack
             screenOptions={{
               header: (props) => <MaterialNavBar {...props} />,

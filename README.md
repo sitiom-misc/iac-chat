@@ -1,3 +1,3 @@
-# <img src="./src/assets/images/icon.png" alt="logo" width="40" height="40"/> iAC Chat
+# <img src="./src/assets/images/icon.png" alt="logo" width="40" height="40"/> MongoChat
 
-Project for Finals
+A variant of iAC Chat for APPDEVCS - Final Project
