@@ -1,7 +1,7 @@
 import { BottomNavigation } from "react-native-paper";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { CommonActions } from "@react-navigation/native";
-import { Href } from "expo-router/src/link/href";
+import { ExpoRouter } from "expo-router/types/expo-router";
 import { router } from "expo-router";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
@@ -44,7 +44,7 @@ function MaterialTabBar({
         const tabBarButton = descriptors[route.key].options.tabBarButton?.({
           children: undefined,
         }) as React.ReactElement;
-        const href: Href = tabBarButton?.props.href;
+        const href: ExpoRouter.Href = tabBarButton?.props.href;
 
         if (href !== undefined) {
           router.push(href);

@@ -32,7 +32,7 @@ export default function HistoryScreen() {
         icon="logout"
         onPress={async () => {
           if (
-            (await GoogleSignin.isSignedIn()) &&
+            GoogleSignin.hasPreviousSignIn() &&
             auth.currentUser?.providerData[0].providerId === "google.com"
           ) {
             await GoogleSignin.signOut();

@@ -6,7 +6,7 @@ import {
   ToastAndroid,
 } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
-import { BarCodeScanner } from "expo-barcode-scanner";
+import { CameraView, Camera } from "expo-camera";
 import { useAuth, useFirestore } from "reactfire";
 import { DocumentReference, doc, getDoc } from "firebase/firestore";
 import { User } from "@/types";
@@ -20,12 +20,12 @@ export default function ScanScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
+    const getCameraPermissions = async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
     };
 
-    getBarCodeScannerPermissions();
+    getCameraPermissions();
   }, []);
 
   if (hasPermission === null) {
@@ -46,8 +46,8 @@ export default function ScanScreen() {
 
   return (
     <View style={styles.container}>
-      <BarCodeScanner
-        onBarCodeScanned={async ({ data }) => {
+      <CameraView
+        onBarcodeScanned={async ({ data }) => {
           if (!data.startsWith("iacchat:")) return;
           const userId = data.replace(/^iacchat:/, "");
           if (userId === currentUser.uid) {
@@ -72,7 +72,9 @@ export default function ScanScreen() {
           width: width * 2.5,
           height: height * 1.5,
         }}
-        barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr"],
+        }}
       />
     </View>
   );

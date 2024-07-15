@@ -118,7 +118,7 @@ export default function ContactScreen() {
     }
   }, [isSubmitSuccessful]);
 
-  if (emailParam !== undefined && emailParam !== email) {
+  if (!!emailParam && emailParam !== email) {
     setValue("email", emailParam, {
       shouldTouch: true,
       shouldValidate: true,
@@ -183,8 +183,7 @@ export default function ContactScreen() {
           visible={isdialogOpened || !!emailParam}
           onDismiss={() => {
             setDialogOpened(false);
-            // @ts-ignore
-            router.setParams({ email: undefined });
+            router.setParams({ email: "" });
             reset();
           }}
         >
@@ -244,8 +243,7 @@ export default function ContactScreen() {
                   contacts: [...userData.contacts, userId],
                 });
                 setDialogOpened(false);
-                // @ts-ignore
-                router.setParams({ email: undefined });
+                router.setParams({ email: "" });
                 setConfettiVisible(true);
               })}
               disabled={!isValid || isSubmitting}
